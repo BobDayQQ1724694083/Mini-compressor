@@ -2,27 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-/*ÓÃHuffmanËã·¨Ğ´³öÒ»¸ö³ÌĞòÊµÏÖÎÄ¼şµÄÑ¹Ëõ(ºÍ½âÑ¹Ëõ)*/
-//ÔõÃ´ÊäÈëÊı¾İ£¬ÕâÀïÇ£³¶µ½×ÖÄ¸×ªASCII¶ş½øÖÆ
-//Êä³ö¶ş½øÖÆ
+/*ç”¨Huffmanç®—æ³•å†™å‡ºä¸€ä¸ªç¨‹åºå®ç°æ–‡ä»¶çš„å‹ç¼©(å’Œè§£å‹ç¼©)*/
+//æ€ä¹ˆè¾“å…¥æ•°æ®ï¼Œè¿™é‡Œç‰µæ‰¯åˆ°å­—æ¯è½¬ASCIIäºŒè¿›åˆ¶
+//è¾“å‡ºäºŒè¿›åˆ¶
 
-//´óÌåÁ÷³Ì
-//½«¶ÁÈ¡µÄÊı¾İ·Å½øÒ»¸öÊı×é
-//Õâ¸öÊı×éµÄÔªËØÊÇÖ¸Õë£¬Ö¸ÏòdumbÓò, nameÓò, frequencyÓòµÈÓòµÄ½á¹¹
-//ÔÚ°ÑÕâ¸öÊı×é±ä³É¶ş²æ¶Ñ
+//å¤§ä½“æµç¨‹
+//å°†è¯»å–çš„æ•°æ®æ”¾è¿›ä¸€ä¸ªæ•°ç»„
+//è¿™ä¸ªæ•°ç»„çš„å…ƒç´ æ˜¯æŒ‡é’ˆï¼ŒæŒ‡å‘dumbåŸŸ, nameåŸŸ, frequencyåŸŸç­‰åŸŸçš„ç»“æ„
+//åœ¨æŠŠè¿™ä¸ªæ•°ç»„å˜æˆäºŒå‰å †
 
-#define characterKind 128       //7Î»¿ÉÒÔ´ú±í128¸ö×Ö·û
-typedef struct character *leaf; //Õâ¸öÓÃÓÚÖ®ºó½¨Ê÷8/8
+#define characterKind 128       //7ä½å¯ä»¥ä»£è¡¨128ä¸ªå­—ç¬¦
+typedef struct character *leaf; //è¿™ä¸ªç”¨äºä¹‹åå»ºæ ‘8/8
 struct character
 {
-    int dumb; //ÅĞ¶ÏÊÇ·ñÎªÑÆ½áµã
+    int dumb; //åˆ¤æ–­æ˜¯å¦ä¸ºå“‘ç»“ç‚¹
     char name;
     int frequency;
-    leaf left;  //×óÊ÷Ò¶
-    leaf right; //ÓÒÊ÷Ò¶
+    leaf left;  //å·¦æ ‘å¶
+    leaf right; //å³æ ‘å¶
 };
 
-//Õ»µÄÀı³Ì
+//æ ˆçš„ä¾‹ç¨‹
 typedef struct stackNode *Stack;
 typedef struct stackNode *Postion;
 typedef struct stackNode *SNode;
@@ -36,53 +36,53 @@ int pop(Stack S);
 void push(int element, Stack S);
 int isEmpty(Stack S);
 
-//½«Êı¾İÊÕ¼¯ÆğÀ´£¬Éè×Ö·ûÖÖÀàÎªM£¬¸öÊıÎªN¡£¸ÃÀı³ÌÔËĞĞÊ±¼äÎªO(N*M)
+//å°†æ•°æ®æ”¶é›†èµ·æ¥ï¼Œè®¾å­—ç¬¦ç§ç±»ä¸ºMï¼Œä¸ªæ•°ä¸ºNã€‚è¯¥ä¾‹ç¨‹è¿è¡Œæ—¶é—´ä¸ºO(N*M)
 void collectData(char filename[], struct character *collectTable[], int *size);
 
-//¿ªÊ¼½¨¶Ñ
-typedef struct character *queueNode;      //²åÈëµ½¶ÑµÄÔªËØ
-typedef struct character **priorityQueue; //Ïàµ±ÓÚÒ»¸öÖ¸ÏòÖ¸ÕëµÄÖ¸Õë£¬¼´Ò»¸öÊı×é
-typedef struct character *queueMin;       //Ö¸Ïò¶ÑÖĞ×îĞ¡µÄÔªËØµÄÖ¸Õë
-//Õâ¸ö¶ÑĞèÒªbuildHeap(), deleteMin(),downFilter(), insert()µÈÀı³Ì
+//å¼€å§‹å»ºå †
+typedef struct character *queueNode;      //æ’å…¥åˆ°å †çš„å…ƒç´ 
+typedef struct character **priorityQueue; //ç›¸å½“äºä¸€ä¸ªæŒ‡å‘æŒ‡é’ˆçš„æŒ‡é’ˆï¼Œå³ä¸€ä¸ªæ•°ç»„
+typedef struct character *queueMin;       //æŒ‡å‘å †ä¸­æœ€å°çš„å…ƒç´ çš„æŒ‡é’ˆ
+//è¿™ä¸ªå †éœ€è¦buildHeap(), deleteMin(),downFilter(), insert()ç­‰ä¾‹ç¨‹
 priorityQueue buildHeap(struct character *collectTable[], int *size);
 queueMin deleteMin(priorityQueue Q, int *size);
-void downFiler(int i, struct character *collectTable[], int *size); //½«collectTable[i]Ö¸ÏòµÄÔªËØÏÂÂËµ½ÕıÈ·Î»ÖÃ
+void downFiler(int i, struct character *collectTable[], int *size); //å°†collectTable[i]æŒ‡å‘çš„å…ƒç´ ä¸‹æ»¤åˆ°æ­£ç¡®ä½ç½®
 void insert(queueNode q, priorityQueue Q, int *size);
 
-//½øĞĞÁ½´ÎdeleteMin()²¢ºÏ²¢MIN£¬ÔÙ°ÑºÏ²¢µÄÔªËØ·Å½øÈ¥,Ö±µ½deleteMin()Îª¿Õ
-//ÆäÊµ×î¶àÖ´ĞĞN-1´ÎºÏ²¢¾Í½áÊøÁË,µ«ÎÒÃÇÒÔcollectTableSize×÷Îª²ÎÕÕ
-typedef struct character *dumb; //ÑÆ½áµã£¬Á¬½ÓÁ½¸ö½áµãµÄ½áµã(»òÊÇÁ¬½ÓÒ»¸ö»òÕßÁ½¸öÊ÷Ò¶µÄ½áµã)
-//Òª½¨Á¢Ò»¸ö±àÂë±í£¬À´¼ÇÂ¼Éú³ÉµÄhuffman±àÂë
+//è¿›è¡Œä¸¤æ¬¡deleteMin()å¹¶åˆå¹¶MINï¼Œå†æŠŠåˆå¹¶çš„å…ƒç´ æ”¾è¿›å»,ç›´åˆ°deleteMin()ä¸ºç©º
+//å…¶å®æœ€å¤šæ‰§è¡ŒN-1æ¬¡åˆå¹¶å°±ç»“æŸäº†,ä½†æˆ‘ä»¬ä»¥collectTableSizeä½œä¸ºå‚ç…§
+typedef struct character *dumb; //å“‘ç»“ç‚¹ï¼Œè¿æ¥ä¸¤ä¸ªç»“ç‚¹çš„ç»“ç‚¹(æˆ–æ˜¯è¿æ¥ä¸€ä¸ªæˆ–è€…ä¸¤ä¸ªæ ‘å¶çš„ç»“ç‚¹)
+//è¦å»ºç«‹ä¸€ä¸ªç¼–ç è¡¨ï¼Œæ¥è®°å½•ç”Ÿæˆçš„huffmanç¼–ç 
 
-//ÓÃÉ¢ÁĞ±í£¬ÉèÖÃÒ»¸ö128¸öÔªËØµÄÊı×é(¿ÉÒÔ×°ÏÂASCIIÂë±íµÄËùÓĞÔªËØ)
-//¸ÃÊı×éÃ¿Ò»¸öÔªËØÊÇÒ»¸öÖ¸Õë£¬Ö¸ÏòÒ»¸öÕûĞÍ±äÁ¿encoding
+//ç”¨æ•£åˆ—è¡¨ï¼Œè®¾ç½®ä¸€ä¸ª128ä¸ªå…ƒç´ çš„æ•°ç»„(å¯ä»¥è£…ä¸‹ASCIIç è¡¨çš„æ‰€æœ‰å…ƒç´ )
+//è¯¥æ•°ç»„æ¯ä¸€ä¸ªå…ƒç´ æ˜¯ä¸€ä¸ªæŒ‡é’ˆï¼ŒæŒ‡å‘ä¸€ä¸ªæ•´å‹å˜é‡encoding
 typedef char *HashTable;
-//½¨Á¢É¢ÁĞ±íµÄÀı³Ì
+//å»ºç«‹æ•£åˆ—è¡¨çš„ä¾‹ç¨‹
 
 enum direction
 {
     leftTree,
     rightTree
-}; //ÓÃÓÚÅĞ¶ÏÊÇ×óÊ÷Ò¶»¹ÊÇÓÒÊ÷Ò¶,×óÊ÷Ò¶ÊÇ±àÂëÎª0£¬ÓÒÊ÷Ò¶±àÂëÊÇ1
-//1.¹¹½¨huffmanÊ÷.
-//½«ËüÃÇµÄºÍ×÷Îª¹ş·òÂüÊ÷µÄÈ¨Öµ½Úµã,¹¹½¨µ½huffmanÊ÷ÖĞ;
+}; //ç”¨äºåˆ¤æ–­æ˜¯å·¦æ ‘å¶è¿˜æ˜¯å³æ ‘å¶,å·¦æ ‘å¶æ˜¯ç¼–ç ä¸º0ï¼Œå³æ ‘å¶ç¼–ç æ˜¯1
+//1.æ„å»ºhuffmanæ ‘.
+//å°†å®ƒä»¬çš„å’Œä½œä¸ºå“ˆå¤«æ›¼æ ‘çš„æƒå€¼èŠ‚ç‚¹,æ„å»ºåˆ°huffmanæ ‘ä¸­;
 typedef struct character *huffmanTree;
 huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size);
-//2.Í¨¹ı¹ş·òÂüÊ÷²úÉú¹ş·òÂü±àÂë;
-//¹æÔòÊÇ£º´Ó¸ù½Úµã³ö·¢£¬Íù×ó×ß-->0 £¬ÍùÓÒ×ß-->1,
-//Óöµ½Ò¶×Ó½ÚµãµÄÇé¿ö£¬¾Í½«Ëü¶ÔÓ¦µÄhuffman±àÂëĞ´ÈëÊı×éÖĞ¡£
+//2.é€šè¿‡å“ˆå¤«æ›¼æ ‘äº§ç”Ÿå“ˆå¤«æ›¼ç¼–ç ;
+//è§„åˆ™æ˜¯ï¼šä»æ ¹èŠ‚ç‚¹å‡ºå‘ï¼Œå¾€å·¦èµ°-->0 ï¼Œå¾€å³èµ°-->1,
+//é‡åˆ°å¶å­èŠ‚ç‚¹çš„æƒ…å†µï¼Œå°±å°†å®ƒå¯¹åº”çš„huffmanç¼–ç å†™å…¥æ•°ç»„ä¸­ã€‚
 void buildCodingSchedule(huffmanTree T, HashTable codingSchedule[], int bits, int *size, const int tableSize);
-void encoding(huffmanTree T, char bitCoding[], char *codingSchedule[], int bits, enum direction dire, const int tableSize); //¸ÃÀı³Ì±éÀúHuffmanÊ÷£¬±éÀúµ½·ÇÑÆ½áµãÊ±½«Êı¾İ¼ÇÂ¼µ½É¢ÁĞ±í
+void encoding(huffmanTree T, char bitCoding[], char *codingSchedule[], int bits, enum direction dire, const int tableSize); //è¯¥ä¾‹ç¨‹éå†Huffmanæ ‘ï¼Œéå†åˆ°éå“‘ç»“ç‚¹æ—¶å°†æ•°æ®è®°å½•åˆ°æ•£åˆ—è¡¨
 
-//ÎÒÃÇÔÚ½âÑ¹Ö®Ç°Òª±àĞ´ÅäÖÃÎÄ¼ş
-//ÎÒÃÇÒª½âÑ¹µÄ»°±ØĞëÒªÖªµÀÕâ¿ÉhuffmanÊ÷£¬ËùÒÔÔÚÑ¹ËõµÄÊ±ºòĞèÒª±àĞ´Ò»¸öÅäÖÃÎÄ¼şÀ´
-//´æ´¢huffmanÊ÷µÄĞÅÏ¢£¨¸÷¸ö×Ö·ûÒÔ¼°×Ö·û³öÏÖµÄ´ÎÊı£©¡£
-//ÔÚÅäÖÃÎÄ¼şÀïÃæ½«£º×Ö·û+×Ö·û³öÏÖµÄ´ÎÊı´æÔÚÒ»ĞĞ
-//ÔÚÕâÀïÒªÊ¹ÓÃitoaÕâ¸öº¯Êı£¬½«´ÎÊı×ª»»³ÉÒ»¸ö×Ö·û´®(string)ÀàĞÍ´æ´¢
-//Ñ¹ËõÓë½âÑ¹Àı³Ì
-char *compress(char *filename, HashTable codingSchedule[], int *compressNum);                         //·µ»ØÑ¹ËõµÄ×Ö·û¸öÊı
-void WriteToTheConfiguration(priorityQueue Q, int collectTableSizeCopy, char *configurationFileName); //Ğ´ÈëÅäÖÃÎÄ¼şµÄÀı³Ì
-priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *collectTableSize);        //·µ»ØÒ»¸ö¶ş²æ¶Ñ£¬Îª½âÂëµÄÊ±ºòÅÅ³ı¸½¼ÓµÄ08
+//æˆ‘ä»¬åœ¨è§£å‹ä¹‹å‰è¦ç¼–å†™é…ç½®æ–‡ä»¶
+//æˆ‘ä»¬è¦è§£å‹çš„è¯å¿…é¡»è¦çŸ¥é“è¿™å¯huffmanæ ‘ï¼Œæ‰€ä»¥åœ¨å‹ç¼©çš„æ—¶å€™éœ€è¦ç¼–å†™ä¸€ä¸ªé…ç½®æ–‡ä»¶æ¥
+//å­˜å‚¨huffmanæ ‘çš„ä¿¡æ¯ï¼ˆå„ä¸ªå­—ç¬¦ä»¥åŠå­—ç¬¦å‡ºç°çš„æ¬¡æ•°ï¼‰ã€‚
+//åœ¨é…ç½®æ–‡ä»¶é‡Œé¢å°†ï¼šå­—ç¬¦+å­—ç¬¦å‡ºç°çš„æ¬¡æ•°å­˜åœ¨ä¸€è¡Œ
+//åœ¨è¿™é‡Œè¦ä½¿ç”¨itoaè¿™ä¸ªå‡½æ•°ï¼Œå°†æ¬¡æ•°è½¬æ¢æˆä¸€ä¸ªå­—ç¬¦ä¸²(string)ç±»å‹å­˜å‚¨
+//å‹ç¼©ä¸è§£å‹ä¾‹ç¨‹
+char *compress(char *filename, HashTable codingSchedule[], int *compressNum);                         //è¿”å›å‹ç¼©çš„å­—ç¬¦ä¸ªæ•°
+void WriteToTheConfiguration(priorityQueue Q, int collectTableSizeCopy, char *configurationFileName); //å†™å…¥é…ç½®æ–‡ä»¶çš„ä¾‹ç¨‹
+priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *collectTableSize);        //è¿”å›ä¸€ä¸ªäºŒå‰å †ï¼Œä¸ºè§£ç çš„æ—¶å€™æ’é™¤é™„åŠ çš„08
 
 char *decompression(char *filename, huffmanTree T, int *sum);
 
@@ -91,8 +91,8 @@ void Decompress();
 
 int main()
 {
-    int selection = 3; //0´ú±íÑ¡ÔñÑ¹Ëõ£¬1´ú±í½âÑ¹; ³õÊ¼ÊÇ3ÎªÁË½øwhileÑ­»·
-    //Èç¹ûÊäÈë×Ö·û¸øselection£¬³ÌĞò»á×Ô¶¯Í£Ö¹
+    int selection = 3; //0ä»£è¡¨é€‰æ‹©å‹ç¼©ï¼Œ1ä»£è¡¨è§£å‹; åˆå§‹æ˜¯3ä¸ºäº†è¿›whileå¾ªç¯
+    //å¦‚æœè¾“å…¥å­—ç¬¦ç»™selectionï¼Œç¨‹åºä¼šè‡ªåŠ¨åœæ­¢
     while ((selection == 0 || selection == 1) || selection != 2)
     {
         if (selection == 0)
@@ -100,24 +100,24 @@ int main()
         else if (selection == 1)
             Decompress();
 
-        printf("\nÇëÑ¡Ôñ·şÎñ£º0.Ñ¹Ëõ    1.½âÑ¹\n");
-        printf("ÌáÊ¾£º(ÊäÈëÑ¡Ôñ0»ò1²¢°´ENTER½¨½áÊøÊäÈë£¬ÊäÈë\'2\'½áÊø³ÌĞò)\n");
+        printf("\nè¯·é€‰æ‹©æœåŠ¡ï¼š0.å‹ç¼©    1.è§£å‹\n");
+        printf("æç¤ºï¼š(è¾“å…¥é€‰æ‹©0æˆ–1å¹¶æŒ‰ENTERå»ºç»“æŸè¾“å…¥ï¼Œè¾“å…¥\'2\'ç»“æŸç¨‹åº)\n");
         scanf("%d", &selection);
         while (selection != 0 && selection != 1 && selection != 2)
         {
             while ((getchar()) != '\n')
                 continue;
-            printf("ÇëÊäÈëÊı×Ö0,1»ò2£¬²¢°´ENTER¼ü½áÊøÊäÈë!\n");
-            printf("ÄãÑ¡ÔñµÄ·şÎñÊÇ£º");
+            printf("è¯·è¾“å…¥æ•°å­—0,1æˆ–2ï¼Œå¹¶æŒ‰ENTERé”®ç»“æŸè¾“å…¥!\n");
+            printf("ä½ é€‰æ‹©çš„æœåŠ¡æ˜¯ï¼š");
             scanf("%d", &selection);
         }
     }
-    printf("Ğ»Ğ»Ê¹ÓÃ£¡\n");
+    printf("è°¢è°¢ä½¿ç”¨ï¼\n");
     system("pause");
     return 0;
 }
 
-void collectData(char filename[], struct character *collectTable[], int *size) //Ò»¸ö×Ö·û´®¼´Ñ¹ËõÎÄ¼şµÄÃû³Æ
+void collectData(char filename[], struct character *collectTable[], int *size) //ä¸€ä¸ªå­—ç¬¦ä¸²å³å‹ç¼©æ–‡ä»¶çš„åç§°
 {
 
     int i;
@@ -126,10 +126,10 @@ void collectData(char filename[], struct character *collectTable[], int *size) /
     char ch;
     if (pf == NULL)
     {
-        printf("Î´ÕÒµ½¸ÃÎÄ¼ş£¡\n");
-        printf("ÎÄ¼ş¿ÉÄÜ²»´æÔÚ»ò³ÌĞòÓëÎÄ¼ş²»ÔÚÍ¬Ò»ÎÄ¼şÄ¿Â¼ÏÂ\n");
-        printf("ÇëÖØĞÂÆô¶¯³ÌĞòÖØÊÔ\n");
-        printf("Ğ»Ğ»Ê¹ÓÃ£¡\n");
+        printf("æœªæ‰¾åˆ°è¯¥æ–‡ä»¶ï¼\n");
+        printf("æ–‡ä»¶å¯èƒ½ä¸å­˜åœ¨æˆ–ç¨‹åºä¸æ–‡ä»¶ä¸åœ¨åŒä¸€æ–‡ä»¶ç›®å½•ä¸‹\n");
+        printf("è¯·é‡æ–°å¯åŠ¨ç¨‹åºé‡è¯•\n");
+        printf("è°¢è°¢ä½¿ç”¨ï¼\n");
         exit(0);
     }
     else
@@ -137,10 +137,10 @@ void collectData(char filename[], struct character *collectTable[], int *size) /
         while ((ch = fgetc(pf)) != EOF) //O(N)
         {
             // putchar(ch);
-            if (*size == 0) //Îª¿ÕµÄÊ±ºòÖ±½Ó²åÈë
+            if (*size == 0) //ä¸ºç©ºçš„æ—¶å€™ç›´æ¥æ’å…¥
             {
-                collectTable[0] = malloc(sizeof(struct character)); //collextTable[0]ÊÇ¸öÑÆ½áµã
-                tmpCell = malloc(sizeof(struct character));         //ºöÂÔÁË´íÎó¼ì²â
+                collectTable[0] = malloc(sizeof(struct character)); //collextTable[0]æ˜¯ä¸ªå“‘ç»“ç‚¹
+                tmpCell = malloc(sizeof(struct character));         //å¿½ç•¥äº†é”™è¯¯æ£€æµ‹
                 tmpCell->dumb = 0;
                 tmpCell->name = ch;
                 tmpCell->frequency = 1;
@@ -160,9 +160,9 @@ void collectData(char filename[], struct character *collectTable[], int *size) /
                     }
                 }
 
-                if (i > *size) //ËµÃ÷Ã»ÓĞÕÒµ½
+                if (i > *size) //è¯´æ˜æ²¡æœ‰æ‰¾åˆ°
                 {
-                    tmpCell = malloc(sizeof(struct character)); //ºöÂÔÁË´íÎó¼ì²â
+                    tmpCell = malloc(sizeof(struct character)); //å¿½ç•¥äº†é”™è¯¯æ£€æµ‹
                     tmpCell->name = ch;
                     tmpCell->dumb = 0;
                     tmpCell->frequency = 1;
@@ -188,7 +188,7 @@ priorityQueue buildHeap(struct character *collectTable[], int *size)
     {
         downFiler(i, collectTable, size);
     }
-    collectTable[0]->frequency = *size; //±£´æ¶ÑÖĞÔªËØµÄÊıÁ¿
+    collectTable[0]->frequency = *size; //ä¿å­˜å †ä¸­å…ƒç´ çš„æ•°é‡
     Q = collectTable;
     return Q;
 }
@@ -218,20 +218,20 @@ void downFiler(int i, priorityQueue collectTable, int *size)
     collectTable[i] = tmpCell;
 }
 
-queueMin deleteMin(priorityQueue Q, int *size) //É¾³ıÒ»¸öÔªËØ¼ÇµÃ°ÑQ[0]->frequency»òcollectTableSize-1
+queueMin deleteMin(priorityQueue Q, int *size) //åˆ é™¤ä¸€ä¸ªå…ƒç´ è®°å¾—æŠŠQ[0]->frequencyæˆ–collectTableSize-1
 {
     queueMin Node;
-    int lastest = *size; //×îÄ©Î²ÔªËØµÄË÷Òı
+    int lastest = *size; //æœ€æœ«å°¾å…ƒç´ çš„ç´¢å¼•
 
     Node = Q[1];
     Q[1] = Q[lastest];
-    *size -= 1; //¶ÑÄÚÔªËØ¼õÒ»
+    *size -= 1; //å †å†…å…ƒç´ å‡ä¸€
     Q[0]->frequency -= 1;
     downFiler(1, Q, size);
     return Node;
 }
 
-void insert(queueNode q, priorityQueue Q, int *size) //ºÏ²¢µÄÔªËØ²åÈë¶Ñ
+void insert(queueNode q, priorityQueue Q, int *size) //åˆå¹¶çš„å…ƒç´ æ’å…¥å †
 {
 
     int i;
@@ -242,11 +242,11 @@ void insert(queueNode q, priorityQueue Q, int *size) //ºÏ²¢µÄÔªËØ²åÈë¶Ñ
         downFiler(i, Q, size);
 }
 
-huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //Ò»Ö±±£³ÖÊ÷µÄÓÒ×ÓÊ÷²»Ğ¡ÓÚ×ó×ÓÊ÷
+huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //ä¸€ç›´ä¿æŒæ ‘çš„å³å­æ ‘ä¸å°äºå·¦å­æ ‘
 {
 
     queueMin first;
-    queueMin second; //Á½´ÎDeleteMinËùµÃµÄÈ¨ÖØ×îĞ¡µÄÔªËØ
+    queueMin second; //ä¸¤æ¬¡DeleteMinæ‰€å¾—çš„æƒé‡æœ€å°çš„å…ƒç´ 
     dumb dumbNode;
 
     while (*size != 1)
@@ -257,11 +257,11 @@ huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //Ò»Ö±±£
         // printf("first (dumb%d) %c : %d \n", first->dumb, first->name, first->frequency);
         // printf("second (dumb%d) %c : %d \n", second->dumb, second->name, second->frequency);
         if (first->dumb != 1 && second->dumb != 1)
-        { //Õâ¸öÑÆ½áµã»áÓĞÁ½¸öÊ÷Ò¶
+        { //è¿™ä¸ªå“‘ç»“ç‚¹ä¼šæœ‰ä¸¤ä¸ªæ ‘å¶
             dumbNode = malloc(sizeof(struct character));
             if (dumbNode == NULL)
             {
-                printf("ÄÚ´æ²»¹»£¬ÇëÖØĞÂÆô¶¯³ÌĞò\n");
+                printf("å†…å­˜ä¸å¤Ÿï¼Œè¯·é‡æ–°å¯åŠ¨ç¨‹åº\n");
                 exit(0);
             }
             else
@@ -279,7 +279,7 @@ huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //Ò»Ö±±£
                 dumbNode = malloc(sizeof(struct character));
                 if (dumbNode == NULL)
                 {
-                    printf("ÄÚ´æ²»¹»£¬ÇëÖØĞÂÆô¶¯³ÌĞò\n");
+                    printf("å†…å­˜ä¸å¤Ÿï¼Œè¯·é‡æ–°å¯åŠ¨ç¨‹åº\n");
                     exit(0);
                 }
                 else
@@ -294,7 +294,7 @@ huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //Ò»Ö±±£
             {
                 if (dumbNode == NULL)
                 {
-                    printf("ÄÚ´æ²»¹»£¬ÇëÖØĞÂÆô¶¯³ÌĞò\n");
+                    printf("å†…å­˜ä¸å¤Ÿï¼Œè¯·é‡æ–°å¯åŠ¨ç¨‹åº\n");
                     exit(0);
                 }
                 else
@@ -316,20 +316,20 @@ huffmanTree buildHuffmanTree(priorityQueue Q, huffmanTree T, int *size) //Ò»Ö±±£
 
 void encoding(huffmanTree T, char bitCoding[], char *codingSchedule[], int bits,
               enum direction dire, const int tableSize)
-//¸ÃÀı³Ì±éÀúHuffmanÊ÷£¬±éÀúµ½·ÇÑÆ½áµãÊ±½«Êı¾İ¼ÇÂ¼µ½É¢ÁĞ±í
+//è¯¥ä¾‹ç¨‹éå†Huffmanæ ‘ï¼Œéå†åˆ°éå“‘ç»“ç‚¹æ—¶å°†æ•°æ®è®°å½•åˆ°æ•£åˆ—è¡¨
 {
 
     int bts = bits + 1;
     if (T->dumb == 0)
     {
-        int index = (int)T->name; //codingScheduleµÄÏÂ±ê
+        int index = (int)T->name; //codingScheduleçš„ä¸‹æ ‡
         // printf("bits = %d\n", bits);
         // printf("%d character %c : frequency %d\n", bits, T->name, T->frequency);
-        char *tmp = malloc(sizeof(char) * bts); //tmpÊÇ×Ö·û´®Êı×é£¬¶îÍâµÄÒ»Î»ÊÇ'\0'
+        char *tmp = malloc(sizeof(char) * bts); //tmpæ˜¯å­—ç¬¦ä¸²æ•°ç»„ï¼Œé¢å¤–çš„ä¸€ä½æ˜¯'\0'
         for (int i = 0; i < bits; i++)
-            tmp[i] = bitCoding[i]; //½«bitCodingµÄÔªËØÈ«²¿¿½±´µ½tmpÖĞ;
+            tmp[i] = bitCoding[i]; //å°†bitCodingçš„å…ƒç´ å…¨éƒ¨æ‹·è´åˆ°tmpä¸­;
         tmp[bits] = '\0';
-        codingSchedule[index] = tmp; //codingScheduleµÄÔªËØ(Ö¸Ïò×Ö·ûÊı×éµÄÖ¸Õë)Ö¸Ïòtmp
+        codingSchedule[index] = tmp; //codingScheduleçš„å…ƒç´ (æŒ‡å‘å­—ç¬¦æ•°ç»„çš„æŒ‡é’ˆ)æŒ‡å‘tmp
     }
     else
     {
@@ -347,27 +347,27 @@ void buildCodingSchedule(huffmanTree T, HashTable codingSchedule[],
 {
 
     enum direction dire = leftTree;
-    char *bitCoding = malloc(sizeof(char) * (*size * 2)); //·ÀÖ¹Õâ¸öÊı×é¿ÉÄÜ»áÔ½½ç
+    char *bitCoding = malloc(sizeof(char) * (*size * 2)); //é˜²æ­¢è¿™ä¸ªæ•°ç»„å¯èƒ½ä¼šè¶Šç•Œ
     encoding(T, bitCoding, codingSchedule, bits, dire, tableSize);
 }
 
-char *compress(char *filename, HashTable codingSchedule[], int *compressNum) //·µ»ØÑ¹ËõÁË¶àÉÙµÄ×Ö·û
-//´ÓÔ­ÎÄ¼şµÃµ½×Ö·û£¬½«¶ÔÓ¦µÄHuffman±àÂëÃ¿Âú8Î»¾ÍĞ´ÈëÑ¹ËõÎÄ¼şÖĞ
-//Èç¹û×îºóÒ»¸ö×Ö½Ú²»Âú8Î»£¬ÓÃ0Ìî³ä, ÓÃÒ»¸ö±éÀú¼ÇÂ¼Ô­ÎÄ¼şÓĞ¶àÉÙ×Ö·û
-//¾Í²»ÓÃµ£ĞÄ×îºóÌî³äµÄ0½âÑ¹Ê±»á±àÂë³ÉÊµ¼Ê×Ö·ûÁË
+char *compress(char *filename, HashTable codingSchedule[], int *compressNum) //è¿”å›å‹ç¼©äº†å¤šå°‘çš„å­—ç¬¦
+//ä»åŸæ–‡ä»¶å¾—åˆ°å­—ç¬¦ï¼Œå°†å¯¹åº”çš„Huffmanç¼–ç æ¯æ»¡8ä½å°±å†™å…¥å‹ç¼©æ–‡ä»¶ä¸­
+//å¦‚æœæœ€åä¸€ä¸ªå­—èŠ‚ä¸æ»¡8ä½ï¼Œç”¨0å¡«å……, ç”¨ä¸€ä¸ªéå†è®°å½•åŸæ–‡ä»¶æœ‰å¤šå°‘å­—ç¬¦
+//å°±ä¸ç”¨æ‹…å¿ƒæœ€åå¡«å……çš„0è§£å‹æ—¶ä¼šç¼–ç æˆå®é™…å­—ç¬¦äº†
 {
 
-    //ÏÈ´ò¿ªÔ­ÎÄ¼ş
+    //å…ˆæ‰“å¼€åŸæ–‡ä»¶
     FILE *source = fopen(filename, "r");
     int j = 0;
     char *compressFileName = strcat(filename, "Compressed.txt");
     FILE *target = fopen(compressFileName, "wb");
     char ch;
     int chr;
-    int bits;          //¶ş½øÖÆÎ»Êı
-    int size;          //Ã¿Ò»¸ö×Ö·ûÏà¶ÔÓÚ±àÂëµÄ´óĞ¡
-    int num = 0;       //Òª×ª»»µÄÊ®½øÖÆÊı×Ö(Ã¿8Î»¾Í×ª»»³É¶ş½øÖÆ´æ´¢µ½Ñ¹ËõÎÄ¼ş)
-    char compressChar; //Òª´æÈë‰º¿sÎÄ¼şµÄ×Ö·û
+    int bits;          //äºŒè¿›åˆ¶ä½æ•°
+    int size;          //æ¯ä¸€ä¸ªå­—ç¬¦ç›¸å¯¹äºç¼–ç çš„å¤§å°
+    int num = 0;       //è¦è½¬æ¢çš„åè¿›åˆ¶æ•°å­—(æ¯8ä½å°±è½¬æ¢æˆäºŒè¿›åˆ¶å­˜å‚¨åˆ°å‹ç¼©æ–‡ä»¶)
+    char compressChar; //è¦å­˜å…¥å£“ç¸®æ–‡ä»¶çš„å­—ç¬¦
     int S = 8;
     int i;
     int fNum;
@@ -376,7 +376,7 @@ char *compress(char *filename, HashTable codingSchedule[], int *compressNum) //·
         *compressNum += 1;
         // printf("*compressNum = %d\n", *compressNum);
 
-        chr = (int)ch; //Ç¿ÖÆÀàĞÍ×ª»»
+        chr = (int)ch; //å¼ºåˆ¶ç±»å‹è½¬æ¢
         i = 0;
         while (codingSchedule[chr][i] != '\0')
         {
@@ -394,14 +394,14 @@ char *compress(char *filename, HashTable codingSchedule[], int *compressNum) //·
             i++;
         }
     }
-    if (S != 8) //ß€ÓĞÎ²°Í
+    if (S != 8) //é‚„æœ‰å°¾å·´
         fNum = fwrite(&num, sizeof(int), 1, target);
     fclose(source);
     fclose(target);
     return compressFileName;
 }
 
-void WriteToTheConfiguration(priorityQueue Q, int collectTableSizeCopy, char *configurationFileName) //Ğ´ÈëÅäÖÃÎÄ¼şµÄÀı³Ì
+void WriteToTheConfiguration(priorityQueue Q, int collectTableSizeCopy, char *configurationFileName) //å†™å…¥é…ç½®æ–‡ä»¶çš„ä¾‹ç¨‹
 {
     FILE *fp = fopen(configurationFileName, "w");
     for (int i = 1; i <= collectTableSizeCopy; i++)
@@ -410,36 +410,36 @@ void WriteToTheConfiguration(priorityQueue Q, int collectTableSizeCopy, char *co
     fclose(fp);
 }
 
-priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *collectTableSize) //·µ»Ø×Ö·ûµÄÆµÂÊ×Ü»á£¬Îª½âÂëµÄÊ±ºòÅÅ³ı¸½¼ÓµÄ0
+priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *collectTableSize) //è¿”å›å­—ç¬¦çš„é¢‘ç‡æ€»ä¼šï¼Œä¸ºè§£ç çš„æ—¶å€™æ’é™¤é™„åŠ çš„0
 {
     int i = 0;
     int y = 0;
     priorityQueue Result;
-    int fre; //×¼»»³ÉÊı×ÖµÄfrequency
+    int fre; //å‡†æ¢æˆæ•°å­—çš„frequency
     char before;
-    char ch; //´æ´¢Ã°ºÅÖ®Ç°µÄ×Ö·û
+    char ch; //å­˜å‚¨å†’å·ä¹‹å‰çš„å­—ç¬¦
     struct character *tmpCell;
     ConfigurationFile = strcat(ConfigurationFile, "ConfigurationFile.txt");
     // printf("0conpressFileName = %s\n", ConfigurationFile);
     FILE *pf = fopen(ConfigurationFile, "r");
-    int colon = 0; //0´ú±íÃ°ºÅÖ®Ç°£¬1´ú±íÃ°ºÅÖ®ºó
-    int chrI = 0;  //×Ö·ûÇ¿ÖÆÀàĞÍ×¼»»µÄÊ®½øÖÆÖµ
+    int colon = 0; //0ä»£è¡¨å†’å·ä¹‹å‰ï¼Œ1ä»£è¡¨å†’å·ä¹‹å
+    int chrI = 0;  //å­—ç¬¦å¼ºåˆ¶ç±»å‹å‡†æ¢çš„åè¿›åˆ¶å€¼
     struct character *result[characterKind + 1];
-    char frequency[20];                           //´æ´¢Ã°ºÅÖ®ºóµÄ×Ö·û
-    result[0] = malloc(sizeof(struct character)); //result[0]ÊÇ¸öÑÆ½áµã
+    char frequency[20];                           //å­˜å‚¨å†’å·ä¹‹åçš„å­—ç¬¦
+    result[0] = malloc(sizeof(struct character)); //result[0]æ˜¯ä¸ªå“‘ç»“ç‚¹
     if (result[0] == NULL)
     {
-        printf("ÄÚ´æ²»¹»!!!\n");
-        printf("ÇëÖØÆô³ÌĞòÖØÊÔ\n");
+        printf("å†…å­˜ä¸å¤Ÿ!!!\n");
+        printf("è¯·é‡å¯ç¨‹åºé‡è¯•\n");
         exit(0);
     }
-    y++; //Êı×é´Óresult[y(1)]¿ªÊ¼´æ´¢Êı¾İ
-    //ÔÚÕâÀïÖ±½Ó½¨Ê÷ÔõÃ´Ñù
+    y++; //æ•°ç»„ä»result[y(1)]å¼€å§‹å­˜å‚¨æ•°æ®
+    //åœ¨è¿™é‡Œç›´æ¥å»ºæ ‘æ€ä¹ˆæ ·
     if (pf == NULL)
     {
-        printf("Î´ÕÒµ½ÅäÖÃÎÄ¼ş!\n");
-        printf("ÎÄ¼ş½âÑ¹Ê§°Ü£¬ÇëÍË³ö³ÌĞòÖØÊÔ!\n");
-        printf("Ğ»Ğ»Ê¹ÓÃ\n");
+        printf("æœªæ‰¾åˆ°é…ç½®æ–‡ä»¶!\n");
+        printf("æ–‡ä»¶è§£å‹å¤±è´¥ï¼Œè¯·é€€å‡ºç¨‹åºé‡è¯•!\n");
+        printf("è°¢è°¢ä½¿ç”¨\n");
         exit(0);
     }
     else
@@ -458,11 +458,11 @@ priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *coll
                 frequency[i] = ch;
                 i++;
                 while ((ch = fgetc(pf)) != '\n')
-                { //¿ÉÒÔºöÂÔµôÃ¿Ò»ĞĞ×îºóµÄ¶àÓàµÄ'\n',×÷ÓÃ¾Í¿ÉÒÔÑ¡³öÎÒÃÇĞèÒª¼ÇÂ¼µÄ'\n'
+                { //å¯ä»¥å¿½ç•¥æ‰æ¯ä¸€è¡Œæœ€åçš„å¤šä½™çš„'\n',ä½œç”¨å°±å¯ä»¥é€‰å‡ºæˆ‘ä»¬éœ€è¦è®°å½•çš„'\n'
                     frequency[i] = ch;
                     i++;
                 }
-                frequency[i] = '\0'; //×ª»»Îª×Ö·û´®
+                frequency[i] = '\0'; //è½¬æ¢ä¸ºå­—ç¬¦ä¸²
                 sscanf(frequency, "%d", &fre);
                 tmpCell = malloc(sizeof(struct character));
                 tmpCell->dumb = 0;
@@ -474,13 +474,13 @@ priorityQueue ReadConfigurationFile(char *ConfigurationFile, int *sum, int *coll
                 (*collectTableSize)++;
                 // printf("0collectTableSize = %d\n", *collectTableSize);
                 // printf("result[y - 1]->name-> %c:%d\n", result[y - 1]->name, result[y - 1]->frequency);
-                //ÕâÀï¾Í¿ÉÒÔ·ÅÈëÊı×éÖĞ
+                //è¿™é‡Œå°±å¯ä»¥æ”¾å…¥æ•°ç»„ä¸­
                 *sum += fre;
                 colon = 0;
                 i = 0;
             }
         }
-        result[0]->frequency = *sum; //¼ÇÂ¼×Ö·ûÆµÂÊµÄ×ÜÊı
+        result[0]->frequency = *sum; //è®°å½•å­—ç¬¦é¢‘ç‡çš„æ€»æ•°
     }
     Result = result;
     return Result;
@@ -494,7 +494,7 @@ int pop(Stack S)
     // printf("S->%d\n", S->next->element);
     if (S->next == NULL)
     {
-        printf("Õ»Îª¿Õ£¡£¡£¡\n");
+        printf("æ ˆä¸ºç©ºï¼ï¼ï¼\n");
         exit(0);
     }
     element = S->next->element;
@@ -528,27 +528,27 @@ int isEmpty(Stack S)
 
 char *decompression(char *filename, huffmanTree T, int *sum)
 {
-    //ÎÒĞèÒªÁ½¸öÕ»
+    //æˆ‘éœ€è¦ä¸¤ä¸ªæ ˆ
     int i = 0;
     int j = 0;
     int y = 0;
     int enterline = 0;
     int popNum;
     Stack bit = NULL;
-    // int bit[8];                                  //°ËÎ»µÄbitValueÃ¿Ò»Î»µÄ¶ş½øÖÆÖµ
-    int Valuedecimal;                           //×Ö·ûµÄÊ®½øÖÆ
-    char bitValue;                              //¶ÁÈ¡µÄ¶ş½øÖÆÊıµÄÖµ
-    char character;                             //ÒªĞ´Èë½âÑ¹ÎÄ¼şµÄ×Ö·û
-    FILE *pCompressFile = fopen(filename, "r"); //ÒÔ¶ş½øÖÆÄ£Ê½´ò¿ªÎÄ¼ş
-    FILE *resultFP = NULL;                      //Ö¸Ïò½âÑ¹ºóÎÄ¼şµÄÖ¸Õë
-    huffmanTree t = T;                          //Ö¸ÏòÊ÷µÄ½áµãµÄÖ¸Õë£¬Ã¿´Î½âÂëÍêÒ»¸ö×Ö·ûºóÖØĞÂÖ¸ÏòÊ÷¸ù
+    // int bit[8];                                  //å…«ä½çš„bitValueæ¯ä¸€ä½çš„äºŒè¿›åˆ¶å€¼
+    int Valuedecimal;                           //å­—ç¬¦çš„åè¿›åˆ¶
+    char bitValue;                              //è¯»å–çš„äºŒè¿›åˆ¶æ•°çš„å€¼
+    char character;                             //è¦å†™å…¥è§£å‹æ–‡ä»¶çš„å­—ç¬¦
+    FILE *pCompressFile = fopen(filename, "r"); //ä»¥äºŒè¿›åˆ¶æ¨¡å¼æ‰“å¼€æ–‡ä»¶
+    FILE *resultFP = NULL;                      //æŒ‡å‘è§£å‹åæ–‡ä»¶çš„æŒ‡é’ˆ
+    huffmanTree t = T;                          //æŒ‡å‘æ ‘çš„ç»“ç‚¹çš„æŒ‡é’ˆï¼Œæ¯æ¬¡è§£ç å®Œä¸€ä¸ªå­—ç¬¦åé‡æ–°æŒ‡å‘æ ‘æ ¹
     char *resultFileName = malloc(sizeof(char) * 30);
     if (pCompressFile == NULL)
     {
         printf("Out of space!!!\n");
         exit(0);
     }
-    //Éè¼ÆºÃ½âÑ¹ºóµÄÎÄ¼şÃû
+    //è®¾è®¡å¥½è§£å‹åçš„æ–‡ä»¶å
     while (filename[i] != '.')
     {
         resultFileName[i] = filename[i];
@@ -564,7 +564,7 @@ char *decompression(char *filename, huffmanTree T, int *sum)
     }
     resultFileName[j] = '\0';
 
-    //Õ»µÄ³õÊ¼»¯
+    //æ ˆçš„åˆå§‹åŒ–
     bit = malloc(sizeof(struct stackNode));
     bit->next = NULL;
     bit->element = 0;
@@ -572,20 +572,20 @@ char *decompression(char *filename, huffmanTree T, int *sum)
     resultFP = fopen(resultFileName, "w");
     if (resultFP == NULL)
     {
-        printf("½âÑ¹Ê§°Ü£¬ÇëÖØÆô³ÌĞòÖØÊÔ£¡\n");
+        printf("è§£å‹å¤±è´¥ï¼Œè¯·é‡å¯ç¨‹åºé‡è¯•ï¼\n");
         exit(0);
     }
     else
-    { //¿ªÊ¼½âÂë
+    { //å¼€å§‹è§£ç 
         while (*sum >= 0)
         {
             y = 0;
-            //¶ÁÈ¡¶ş½øÖÆÊı
+            //è¯»å–äºŒè¿›åˆ¶æ•°
             Valuedecimal = fgetc(pCompressFile);
             if (Valuedecimal == EOF)
                 break;
 
-            //¶ÁÈ¡Ò»×Ö½Ú(8Î»)µÄ×Ö·û
+            //è¯»å–ä¸€å­—èŠ‚(8ä½)çš„å­—ç¬¦
             while (bit->element != 8 && Valuedecimal != 0)
             {
                 // printf("1Valuedecimal.txt = %d\n", Valuedecimal);
@@ -598,20 +598,20 @@ char *decompression(char *filename, huffmanTree T, int *sum)
                 push(0, bit);
                 y++;
             }
-            //±éÀú¶ş½øÖÆÊı×é
+            //éå†äºŒè¿›åˆ¶æ•°ç»„
             while (!isEmpty(bit))
             {
                 if (t->dumb == 0)
                 {
                     character = t->name;
-                    t = T;                              //ÖØĞÂÖ¸ÏòÊ÷¸ù
-                    fprintf(resultFP, "%c", character); //Ğ´ÈëÎÄ¼ş
+                    t = T;                              //é‡æ–°æŒ‡å‘æ ‘æ ¹
+                    fprintf(resultFP, "%c", character); //å†™å…¥æ–‡ä»¶
                     *sum = (*sum) - 1;
                 }
                 else
                 {
                     popNum = pop(bit);
-                    printf("%d", popNum); //´òÓ¡ÎÄ¼şµÄ¶ş½øÖÆÖµ
+                    printf("%d", popNum); //æ‰“å°æ–‡ä»¶çš„äºŒè¿›åˆ¶å€¼
                     enterline++;
                     if (enterline % 4 == 0)
                         printf(" ");
@@ -632,65 +632,65 @@ char *decompression(char *filename, huffmanTree T, int *sum)
     fclose(resultFP);
     return resultFileName;
 }
-//Ñ¹Ëõ
+//å‹ç¼©
 void Compress()
 {
     int i = 0;
-    int bits = 0; //Ò»¸öcountÊı¼ÇÂ¼±àÂë,Ã¿Ò»´ÎÔÚHuffmanÊ÷ÖĞÕÒµ½×Ö·ûÊ±·Å½øÒ»¸öencoding
+    int bits = 0; //ä¸€ä¸ªcountæ•°è®°å½•ç¼–ç ,æ¯ä¸€æ¬¡åœ¨Huffmanæ ‘ä¸­æ‰¾åˆ°å­—ç¬¦æ—¶æ”¾è¿›ä¸€ä¸ªencoding
     const int tableSize = characterKind - 1;
-     //collectTable[0]²»·ÅÔªËØ,²»¹ıÔÚ½¨¶Ñºó¿ÉÒÔ´æ´¢¶ÑÖĞÔªËØµÄÊıÁ¿
-    int collectTableSize = 0; //¼ÇÂ¼collectTable×°ÁË¶àÉÙÖÖ×Ö·ûÁË£¬ÆäÊµÊÇ0
+     //collectTable[0]ä¸æ”¾å…ƒç´ ,ä¸è¿‡åœ¨å»ºå †åå¯ä»¥å­˜å‚¨å †ä¸­å…ƒç´ çš„æ•°é‡
+    int collectTableSize = 0; //è®°å½•collectTableè£…äº†å¤šå°‘ç§å­—ç¬¦äº†ï¼Œå…¶å®æ˜¯0
     int collectTableSizeCopy;
     huffmanTree T;
-    struct character *collectTable[characterKind + 1]; //¼ÇÂ¼Ã¿¸ö×Ö·û³öÏÖÆµÂÊµÄÊı×é
-    HashTable codingSchedule[characterKind - 1];       //ASCIIÒ»¹²ÓĞ127¸ö×Ö·ûÒÔ0¿ªÍ·£¬Õâ¸ö¾ÍÊÇÒ»¸ö¼òµ¥µÄÊı×é£¬²»ÊÇÉ¢ÁĞ±í£¬²»Ïñ¸ÃHashTableÁË
+    struct character *collectTable[characterKind + 1]; //è®°å½•æ¯ä¸ªå­—ç¬¦å‡ºç°é¢‘ç‡çš„æ•°ç»„
+    HashTable codingSchedule[characterKind - 1];       //ASCIIä¸€å…±æœ‰127ä¸ªå­—ç¬¦ä»¥0å¼€å¤´ï¼Œè¿™ä¸ªå°±æ˜¯ä¸€ä¸ªç®€å•çš„æ•°ç»„ï¼Œä¸æ˜¯æ•£åˆ—è¡¨ï¼Œä¸åƒè¯¥HashTableäº†
     char *filename = malloc(sizeof(char) * 30);
     char *filename1 = malloc(sizeof(char) * 30);
     char configurationFileName[20] = "";
-    int compressNum = 0; //¼ÇÂ¼Ñ¹ËõÁË¶àÉÙµÄ×Ö·û
+    int compressNum = 0; //è®°å½•å‹ç¼©äº†å¤šå°‘çš„å­—ç¬¦
     char *compressFileName;
     priorityQueue Q = NULL;
 
-    printf("ÇëÊäÈëÒªÑ¹ËõµÄÎÄ¼şÃû(´øÎÄ¼şºó×ºÒÔENTER½¨½áÊøÊäÈë):\n");
+    printf("è¯·è¾“å…¥è¦å‹ç¼©çš„æ–‡ä»¶å(å¸¦æ–‡ä»¶åç¼€ä»¥ENTERå»ºç»“æŸè¾“å…¥):\n");
     scanf("%s", filename);
     strcpy(filename1, filename);
     collectData(filename, collectTable, &collectTableSize);
     Q = buildHeap(collectTable, &collectTableSize);
-    //½«QĞ´ÈëÒ»¸öÅäÖÃÎÄ¼ş
-    collectTableSizeCopy = collectTableSize; //¼ÇÂ¼collectTable×°ÁË¶àÉÙÖÖ×Ö·ûÁË£¬³õÊ¼ÊÇ0
+    //å°†Qå†™å…¥ä¸€ä¸ªé…ç½®æ–‡ä»¶
+    collectTableSizeCopy = collectTableSize; //è®°å½•collectTableè£…äº†å¤šå°‘ç§å­—ç¬¦äº†ï¼Œåˆå§‹æ˜¯0
     strcpy(configurationFileName, filename);
     strcat(configurationFileName, "Compressed.txtConfigurationFile.txt");
     WriteToTheConfiguration(Q, collectTableSizeCopy, configurationFileName);
     // for (i = 1; i <= collectTableSize; i++)
     // {
     //     printf("Q[%d]'s name is %c and frequency is %d\n", i, Q[i]->name, Q[i]->frequency);
-    // } //±éÀú¶Ñ
+    // } //éå†å †
     // printf("2filename = *%s*\n", filename);
     T = buildHuffmanTree(Q, T, &collectTableSize);
     buildCodingSchedule(T, codingSchedule, bits, &collectTableSizeCopy, tableSize);
-    /*¿ªÊ¼Ñ¹Ëõ*/
+    /*å¼€å§‹å‹ç¼©*/
     // printf("P: %s\n", codingSchedule[80]);
-    compressFileName = compress(filename, codingSchedule, &compressNum); //·µ»ØÑ¹ËõµÄÎÄ¼ş
-    printf("Ñ¹ËõÍê³É!!!\n");
-    printf("×Ü¹²Ñ¹ËõÁË%d¸ö×Ö·û\n", compressNum);
-    printf("Ñ¹ËõºóµÄÎÄ¼şÃûÎª%s\n", compressFileName);
+    compressFileName = compress(filename, codingSchedule, &compressNum); //è¿”å›å‹ç¼©çš„æ–‡ä»¶
+    printf("å‹ç¼©å®Œæˆ!!!\n");
+    printf("æ€»å…±å‹ç¼©äº†%dä¸ªå­—ç¬¦\n", compressNum);
+    printf("å‹ç¼©åçš„æ–‡ä»¶åä¸º%s\n", compressFileName);
     free(T);
 }
 
 void Decompress()
 {
     int i = 0;
-    int sum = 0;              //¶ÁÈ¡µÄ×Ö·ûÆµÂÊÖµµÄ×ÜºÍ
-    int bits = 0;             //Ò»¸öcountÊı¼ÇÂ¼±àÂë,Ã¿Ò»´ÎÔÚHuffmanÊ÷ÖĞÕÒµ½×Ö·ûÊ±·Å½øÒ»¸öencoding
-    int collectTableSize = 0; //¼ÇÂ¼collectTable×°ÁË¶àÉÙÖÖ×Ö·ûÁË£¬ÆäÊµÊÇ0
+    int sum = 0;              //è¯»å–çš„å­—ç¬¦é¢‘ç‡å€¼çš„æ€»å’Œ
+    int bits = 0;             //ä¸€ä¸ªcountæ•°è®°å½•ç¼–ç ,æ¯ä¸€æ¬¡åœ¨Huffmanæ ‘ä¸­æ‰¾åˆ°å­—ç¬¦æ—¶æ”¾è¿›ä¸€ä¸ªencoding
+    int collectTableSize = 0; //è®°å½•collectTableè£…äº†å¤šå°‘ç§å­—ç¬¦äº†ï¼Œå…¶å®æ˜¯0
     huffmanTree T= NULL;
     priorityQueue Q;
-    char *resultFileName; //½âÑ¹ºóµÄÎÄ¼şÃû
+    char *resultFileName; //è§£å‹åçš„æ–‡ä»¶å
     char compressFileName[30];
     char configurationFileName[50];
-    HashTable codingSchedule[characterKind - 1]; //ASCIIÒ»¹²ÓĞ127¸ö×Ö·ûÒÔ0¿ªÍ·£¬Õâ¸ö¾ÍÊÇÒ»¸ö¼òµ¥µÄÊı×é£¬²»ÊÇÉ¢ÁĞ±í£¬²»Ïñ¸ÃHashTableÁË
+    HashTable codingSchedule[characterKind - 1]; //ASCIIä¸€å…±æœ‰127ä¸ªå­—ç¬¦ä»¥0å¼€å¤´ï¼Œè¿™ä¸ªå°±æ˜¯ä¸€ä¸ªç®€å•çš„æ•°ç»„ï¼Œä¸æ˜¯æ•£åˆ—è¡¨ï¼Œä¸åƒè¯¥HashTableäº†
 
-    printf("ÇëÊäÈëÒª½âÑ¹µÄÎÄ¼şÃû(ÒÔENTER½¨½áÊøÊäÈë)\n");
+    printf("è¯·è¾“å…¥è¦è§£å‹çš„æ–‡ä»¶å(ä»¥ENTERå»ºç»“æŸè¾“å…¥)\n");
     scanf("%s", compressFileName);
     while (compressFileName[i] != '\0')
     {
@@ -698,18 +698,17 @@ void Decompress()
         i++;
     }
     configurationFileName[i] = '\0';
-    printf("¿ªÊ¼½âÑ¹£¡\n");
-    printf("ÕıÔÚ¶ÁÈ¡ÅäÖÃÎÄ¼ş...\n");
-    Q = ReadConfigurationFile(configurationFileName, &sum, &collectTableSize); //Õâ¸öÊı×é¾ÍÊÇÓÅÏÈ¶ÓÁĞ
-    T = buildHuffmanTree(Q, T, &collectTableSize);                             //ÖØ½¨ÁËHuffmanÊ÷
-    //¿ªÊ¼ÒÔ¶ş½øÖÆ¶ÁÈ¡Ñ¹ËõÎÄ¼ş£¬²¢°´Ê÷½âÂë£¬sumÊÇ×Ö·û×ÜÊı
+    printf("å¼€å§‹è§£å‹ï¼\n");
+    printf("æ­£åœ¨è¯»å–é…ç½®æ–‡ä»¶...\n");
+    Q = ReadConfigurationFile(configurationFileName, &sum, &collectTableSize); //è¿™ä¸ªæ•°ç»„å°±æ˜¯ä¼˜å…ˆé˜Ÿåˆ—
+    T = buildHuffmanTree(Q, T, &collectTableSize);                             //é‡å»ºäº†Huffmanæ ‘
+    //å¼€å§‹ä»¥äºŒè¿›åˆ¶è¯»å–å‹ç¼©æ–‡ä»¶ï¼Œå¹¶æŒ‰æ ‘è§£ç ï¼Œsumæ˜¯å­—ç¬¦æ€»æ•°
     // printf("%c\n", T->right->right->right->left->right->right->right->left->right->name);
     // printf("1conpressFileName = %s\n", compressFileName);1
-    printf("¶ÁÈ¡ÅäÖÃÎÄ¼ş³É¹¦£¡\n");
-    printf("ÕıÔÚ½âÑ¹...\n");
+    printf("è¯»å–é…ç½®æ–‡ä»¶æˆåŠŸï¼\n");
+    printf("æ­£åœ¨è§£å‹...\n");
     resultFileName = decompression(compressFileName, T, &sum);
-    printf("½âÑ¹³É¹¦!!!\n");
-    printf("½âÑ¹ºóµÄÎÄ¼şÃûÎª:%s\n", resultFileName);
+    printf("è§£å‹æˆåŠŸ!!!\n");
+    printf("è§£å‹åçš„æ–‡ä»¶åä¸º:%s\n", resultFileName);
     free(T);
-    
 }
